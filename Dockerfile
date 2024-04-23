@@ -19,7 +19,7 @@ ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
 # 安装Visual Studio
 RUN Invoke-WebRequest -OutFile C:\\vs_community.exe -Uri https://aka.ms/vs/17/release/vs_community.exe; \
-    Start-Process C:\\vs_community.exe -ArgumentList '--quiet --wait --norestart --nocache \
+    Start-Process -FilePath C:\\vs_community.exe -ArgumentList '--quiet --wait --norestart --nocache \
         --installPath C:\\VisualStudio \
         --add Microsoft.VisualStudio.Workload.NativeDesktop \
         --add Microsoft.VisualStudio.Component.VC.ATLMFC \
