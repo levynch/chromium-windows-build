@@ -9,7 +9,7 @@ SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPref
 # Install Visual Studio Build Tools
 RUN Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile 'vs_buildtools.exe'; `
     Start-Process -FilePath './vs_buildtools.exe' -ArgumentList '--quiet', '--norestart', '--nocache', `
-    '--installPath', "$env:ProgramFiles(x86)\Microsoft Visual Studio\2022\BuildTools", `
+    '--installPath', "${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools", `
     '--add', 'Microsoft.VisualStudio.Workload.NativeDesktop', `
     '--add', 'Microsoft.VisualStudio.Component.VC.ATLMFC', `
     '--includeRecommended' -Wait -NoNewWindow; `
