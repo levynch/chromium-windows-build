@@ -1,19 +1,24 @@
 # escape=`
 
 # Use the latest Windows Server Core 2022 image.
-FROM mcr.microsoft.com/windows/servercore:ltsc2022
+FROM mcr.microsoft.com/windows/server:10.0.20348.2340-amd64
 
 # Set PowerShell as the default shell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# Install Visual Studio Build Tools
-RUN Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile 'vs_buildtools.exe'; `
-    Start-Process -FilePath './vs_buildtools.exe' -ArgumentList '--quiet', '--norestart', '--nocache', `
-    '--installPath', `"$(${env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools)`", `
+# 下载 Visual Studio Build Tools
+RUN Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile 'vs_buildtools.exe'
+
+# 安装 Visual Studio Build Tools
+RUN Start-Process -FilePath 'vs_buildtools.exe' -ArgumentList `
+    '--quiet', '--norestart', '--nocache', `
+    '--installPath', `"C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools"`, `
     '--add', 'Microsoft.VisualStudio.Workload.NativeDesktop', `
     '--add', 'Microsoft.VisualStudio.Component.VC.ATLMFC', `
-    '--includeRecommended' -Wait -NoNewWindow; `
-    Remove-Item -Path 'vs_buildtools.exe' -Force
+    '--includeRecommended' -Wait -NoNewWindow
+
+# 清理安装文件
+RUN Remove-Item -Path 'vs_buildtools.exe' -Force
 
 
 # Set work directory
