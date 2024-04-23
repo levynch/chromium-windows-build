@@ -1,69 +1,50 @@
-# escape=`
-
 # Use the latest Windows Server Core 2022 image.
 FROM mcr.microsoft.com/windows/servercore:ltsc2022
 
+# Set PowerShell as the default shell
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
-# Restore the default Windows shell for correct batch processing.
-SHELL ["cmd", "/S", "/C"]
+# Install Visual Studio Build Tools
+RUN Invoke-WebRequest -Uri 'https://aka.ms/vs/17/release/vs_buildtools.exe' -OutFile 'vs_buildtools.exe'; `
+    Start-Process -FilePath './vs_buildtools.exe' -ArgumentList '--quiet', '--norestart', '--nocache', `
+    '--installPath', "$env:ProgramFiles(x86)\Microsoft Visual Studio\2022\BuildTools", `
+    '--add', 'Microsoft.VisualStudio.Workload.NativeDesktop', `
+    '--add', 'Microsoft.VisualStudio.Component.VC.ATLMFC', `
+    '--includeRecommended' -Wait -NoNewWindow; `
+    Remove-Item -Path 'vs_buildtools.exe' -Force
 
-RUN `
-    curl -SL --output vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe `
-    `
-    && (start /w vs_buildtools.exe --quiet --wait --norestart --nocache `
-        --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" `
-        --add Microsoft.VisualStudio.Workload.NativeDesktop  `
-        --add Microsoft.VisualStudio.Component.VC.ATLMFC `
-        --includeRecommended `
-        || IF "%ERRORLEVEL%"=="3010" EXIT 0) `
-    `
-    # Cleanup
-    && del /q vs_buildtools.exe
+# Set work directory
+WORKDIR C:/chromium
 
-# 设置工作目录
-WORKDIR C:\chromium
+# Install necessary tools
+RUN Invoke-WebRequest -Uri 'https://storage.googleapis.com/chrome-infra/depot_tools.zip' -OutFile 'depot_tools.zip'; `
+    Expand-Archive -Path 'depot_tools.zip' -DestinationPath 'C:/depot_tools'; `
+    Remove-Item 'depot_tools.zip' -Force
 
-# 切换到 PowerShell
-SHELL ["powershell", "-Command"]
-# 安装必要的工具
-RUN $ErrorActionPreference = 'Stop'; `
-    [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; `
-    Invoke-WebRequest -OutFile depot_tools.zip -Uri https://storage.googleapis.com/chrome-infra/depot_tools.zip; `
-    Expand-Archive depot_tools.zip -DestinationPath C:\\depot_tools; `
-    Remove-Item depot_tools.zip -Force;
-
-# 设置环境变量
+# Set environment variables
 ENV PATH="C:\depot_tools;$PATH"
 ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
-
-# 设置工作目录
+# Set work directory
 WORKDIR /sdk
 
-SHELL ["cmd", "/S", "/C"]
-# 下载 Windows SDK 安装程序
-ADD "https://download.microsoft.com/download/d/9/6/d968e973-c27d-4d17-ae51-fc7a98d9b0d3/windowssdk/winsdksetup.exe" C:\sdk\winsdksetup.exe
+# Download Windows SDK installer
+ADD "https://download.microsoft.com/download/d/9/6/d968e973-c27d-4d17-ae51-fc7a98d9b0d3/windowssdk/winsdksetup.exe" C:/sdk/winsdksetup.exe
 
-# 运行安装程序
-# 注意：这里的参数 /features +xxx 可能需要根据实际需要调整，以安装特定的组件
-RUN start /w C:\sdk\winsdksetup.exe /quiet /norestart /features +OptionId.WindowsSoftwareDevelopmentKit /features +OptionId.Debugger
-# 清理安装文件
-RUN del C:\sdk\winsdksetup.exe
+# Run installer
+RUN Start-Process -FilePath 'C:/sdk/winsdksetup.exe' -ArgumentList '/quiet', '/norestart', `
+    '/features', '+OptionId.WindowsSoftwareDevelopmentKit', '/features', '+OptionId.Debugger' -Wait -NoNewWindow; `
+    Remove-Item 'C:/sdk/winsdksetup.exe' -Force
 
+# Set work directory
+WORKDIR C:/chromium
 
-# 设置工作目录
-WORKDIR C:\chromium
+# Clone Chromium source code
+RUN & 'fetch' 'chromium' '--no-history'
+RUN & 'gclient' 'sync'
 
-# 克隆Chromium源码
-SHELL ["cmd", "/S", "/C"]
-ENV PATH="C:\depot_tools;$PATH"
-ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
-RUN fetch chromium --no-history
-RUN gclient sync 
+# Compile Chromium
+# RUN & 'C:/depot_tools/ninja.exe' '-C' 'out/Default' 'chrome'
 
-# 编译Chromium
-# RUN call C:\depot_tools\ninja.exe -C out/Default chrome
-
-# 输出 C:\\chromium 文件夹的大小
-SHELL ["powershell", "-Command"]
-RUN "Get-ChildItem -Path C:\chromium -Recurse | Measure-Object -Property Length -Sum | ForEach-Object { 'Directory size: ' + $_.Sum / 1GB + ' GB' }"
+# Output the size of the C:/chromium folder
+RUN Get-ChildItem -Path 'C:/chromium' -Recurse | Measure-Object -Property Length -Sum | ForEach-Object { "Directory size: $($_.Sum / 1GB) GB" }
