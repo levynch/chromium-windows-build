@@ -1,5 +1,22 @@
 FROM mcr.microsoft.com/windows/server:ltsc2022
 
+
+# Restore the default Windows shell for correct batch processing.
+SHELL ["cmd", "/S", "/C"]
+
+RUN `
+    curl -SL --output vs_buildtools.exe https://aka.ms/vs/17/release/vs_buildtools.exe `
+    `
+    && (start /w vs_buildtools.exe --quiet --wait --norestart --nocache `
+        --installPath "%ProgramFiles(x86)%\Microsoft Visual Studio\2022\BuildTools" `
+        --add Microsoft.VisualStudio.Workload.NativeDesktop  `
+        --add Microsoft.VisualStudio.Component.VC.ATLMFC `
+        --includeRecommended `
+        || IF "%ERRORLEVEL%"=="3010" EXIT 0) `
+    `
+    # Cleanup
+    && del /q vs_buildtools.exe
+
 # 设置工作目录
 WORKDIR C:\\chromium
 
@@ -16,15 +33,6 @@ RUN $ErrorActionPreference = 'Stop'; \
 # 设置环境变量
 ENV PATH="C:\\depot_tools;$PATH"
 ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
-
-# 安装Visual Studio
-# 下载 Visual Studio 安装器
-RUN Invoke-WebRequest -OutFile C:\\vs_community.exe -Uri https://aka.ms/vs/17/release/vs_community.exe
-RUN dir C:\\  # 确认文件已下载
-
-# 安装 Visual Studio
-RUN Start-Process -FilePath C:\\vs_community.exe -ArgumentList '--quiet --wait --norestart --nocache --installPath C:\\VisualStudio --add Microsoft.VisualStudio.Workload.NativeDesktop --add Microsoft.VisualStudio.Component.VC.ATLMFC --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 --includeRecommended' -Wait
-RUN Remove-Item C:\\vs_community.exe -Force
 
 # 安装Debugging Tools
 RUN $sdkPath = 'C:\\Program Files (x86)\\Windows Kits\\10\\'; \
