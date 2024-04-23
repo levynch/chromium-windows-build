@@ -1,5 +1,5 @@
 # 使用Windows Server Core作为基础镜像
-FROM mcr.microsoft.com/windows:10.0.17763.5576-amd64
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
 
 # 设置工作目录
 WORKDIR D:\\chromium
@@ -24,7 +24,6 @@ RUN powershell -Command \
         --installPath C:\\VisualStudio \
         --add Microsoft.VisualStudio.Workload.NativeDesktop \
         --add Microsoft.VisualStudio.Component.VC.ATLMFC \
-        --add Microsoft.VisualStudio.Component.Windows10SDK.22621 \
         --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
         --includeRecommended' -Wait; \
     Remove-Item vs_installer.exe -Force
