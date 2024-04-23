@@ -6,17 +6,15 @@ FROM mcr.microsoft.com/windows/server:10.0.20348.2340-amd64
 # Set PowerShell as the default shell
 SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'; $ProgressPreference = 'SilentlyContinue';"]
 
+# Download Visual Studio Build Tools
+RUN Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_buildtools.exe" -OutFile "vs_buildtools.exe"
 
-RUN Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_buildtools.exe" -OutFile "vs_buildtools.exe"; `
-    Start-Process -FilePath "vs_buildtools.exe" -ArgumentList '--quiet', '--norestart', '--nocache', `
+# Install Visual Studio Build Tools
+RUN Start-Process -FilePath "vs_buildtools.exe" -ArgumentList '--quiet', '--norestart', '--nocache', `
     '--installPath', "${Env:ProgramFiles(x86)}\Microsoft Visual Studio\2022\BuildTools", `
     '--add Microsoft.VisualStudio.Workload.NativeDesktop', `
-    '--add Microsoft.VisualStudio.Component.VC.ATLMFC', `
+    '--add Microsoft.VisualStudio.Component.VC.ATLMFC' -Wait -NoNewWindow; `
     Remove-Item -Path "vs_buildtools.exe" -Force
-
-# 清理安装文件
-RUN Remove-Item -Path 'vs_buildtools.exe' -Force
-
 
 # Set work directory
 WORKDIR C:/chromium
@@ -48,7 +46,7 @@ WORKDIR C:/chromium
 RUN & 'fetch' 'chromium' '--no-history'
 RUN & 'gclient' 'sync'
 
-# Compile Chromium
+# Compile Chromium (commented out)
 # RUN & 'C:/depot_tools/ninja.exe' '-C' 'out/Default' 'chrome'
 
 # Output the size of the C:/chromium folder
