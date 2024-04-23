@@ -1,8 +1,7 @@
-# 使用Windows Server Core作为基础镜像
-FROM mcr.microsoft.com/windows/nanoserver:ltsc2019
+FROM mcr.microsoft.com/windows/servercore:ltsc2019
 
 # 设置工作目录
-WORKDIR D:\\chromium
+WORKDIR C:\\chromium
 
 # 安装必要的工具
 SHELL ["cmd", "/S", "/C"]
@@ -10,11 +9,11 @@ RUN powershell -Command \
     $ErrorActionPreference = 'Stop'; \
     [Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12; \
     Invoke-WebRequest -OutFile depot_tools.zip -Uri https://storage.googleapis.com/chrome-infra/depot_tools.zip; \
-    Expand-Archive depot_tools.zip -DestinationPath D:\\depot_tools; \
+    Expand-Archive depot_tools.zip -DestinationPath C:\\depot_tools; \
     Remove-Item depot_tools.zip -Force;
 
 # 设置环境变量
-ENV PATH="D:\\depot_tools;$PATH"
+ENV PATH="C:\\depot_tools;$PATH"
 ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
 # 安装Visual Studio
@@ -41,6 +40,8 @@ RUN gclient sync
 # 编译Chromium
 # RUN call C:\\depot_tools\\ninja.exe -C out/Default chrome
 
-# 输出 D:\\chromium 文件夹的大小
+# 输出 C:\\chromium 文件夹的大小
 RUN powershell -Command \
     "Get-ChildItem -Path C:\\chromium -Recurse | Measure-Object -Property Length -Sum | ForEach-Object { 'Directory size: ' + $_.Sum / 1GB + ' GB' }"
+
+
