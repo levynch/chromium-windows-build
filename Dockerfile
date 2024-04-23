@@ -45,7 +45,7 @@ ADD "https://download.microsoft.com/download/d/9/6/d968e973-c27d-4d17-ae51-fc7a9
 
 # 运行安装程序
 # 注意：这里的参数 /features +xxx 可能需要根据实际需要调整，以安装特定的组件
-RUN C:\sdk\winsdksetup.exe /quiet /norestart /features +OptionId.WindowsSoftwareDevelopmentKit /features +OptionId.Debugger
+RUN start /w C:\sdk\winsdksetup.exe /quiet /norestart /features +OptionId.WindowsSoftwareDevelopmentKit /features +OptionId.Debugger
 # 清理安装文件
 RUN del C:\sdk\winsdksetup.exe
 
