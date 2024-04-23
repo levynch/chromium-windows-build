@@ -18,14 +18,15 @@ ENV PATH="C:\\depot_tools;$PATH"
 ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
 # 安装Visual Studio
-RUN Invoke-WebRequest -OutFile vs_installer.exe -Uri https://aka.ms/vs/17/release/vs_community.exe; \
-    Start-Process vs_installer.exe -ArgumentList '--quiet --wait --norestart --nocache \
+RUN Invoke-WebRequest -OutFile C:\\vs_installer.exe -Uri https://aka.ms/vs/17/release/vs_community.exe; \
+    Start-Process C:\\vs_installer.exe -ArgumentList '--quiet --wait --norestart --nocache \
         --installPath C:\\VisualStudio \
         --add Microsoft.VisualStudio.Workload.NativeDesktop \
         --add Microsoft.VisualStudio.Component.VC.ATLMFC \
         --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
         --includeRecommended' -Wait; \
-    Remove-Item vs_installer.exe -Force
+    Remove-Item C:\\vs_installer.exe -Force
+
 
 # 安装Debugging Tools
 RUN $sdkPath = 'C:\\Program Files (x86)\\Windows Kits\\10\\'; \
