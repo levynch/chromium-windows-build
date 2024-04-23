@@ -1,4 +1,4 @@
-FROM mcr.microsoft.com/windows/servercore:ltsc2019
+FROM mcr.microsoft.com/windows/server:ltsc2022
 
 # 设置工作目录
 WORKDIR C:\\chromium
