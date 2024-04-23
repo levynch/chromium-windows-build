@@ -4,7 +4,7 @@
 FROM mcr.microsoft.com/windows/server:10.0.20348.2340-amd64
 
 # Set PowerShell as the default shell
-SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop'"]
+SHELL ["powershell", "-Command", "$ErrorActionPreference = 'Stop';"]
 
 # Download Visual Studio Build Tools
 RUN Invoke-WebRequest -Uri "https://aka.ms/vs/17/release/vs_buildtools.exe" -OutFile "vs_buildtools.exe"
