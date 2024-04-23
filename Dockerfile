@@ -1,5 +1,5 @@
 # 使用Windows Server Core作为基础镜像
-FROM mcr.microsoft.com/windows/nanoserver:ltsc2022
+FROM mcr.microsoft.com/windows/nanoserver:ltsc2019
 
 # 设置工作目录
 WORKDIR D:\\chromium
