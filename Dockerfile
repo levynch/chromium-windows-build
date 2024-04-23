@@ -36,11 +36,22 @@ RUN $ErrorActionPreference = 'Stop'; `
 ENV PATH="C:\depot_tools;$PATH"
 ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
-SHELL ["cmd", "/S", "/C"]
-# 安装Debugging Tools
-RUN set "sdkPath=C:\Program Files (x86)\Windows Kits\10\" && `
-    set "debugToolsPath=%sdkPath%Debuggers\x64\dbgsdk.msi" && `
-    start /w msiexec.exe /i "%debugToolsPath%" /quiet /norestart /wait /nocache
+
+# 设置工作目录
+WORKDIR /sdk
+
+# 下载 Windows SDK 安装程序
+ADD "https://download.microsoft.com/download/d/9/6/d968e973-c27d-4d17-ae51-fc7a98d9b0d3/windowssdk/winsdksetup.exe" C:\sdk\winsdksetup.exe
+
+# 运行安装程序
+# 注意：这里的参数 /features +xxx 可能需要根据实际需要调整，以安装特定的组件
+RUN C:\sdk\winsdksetup.exe /quiet /norestart /features +OptionId.WindowsSoftwareDevelopmentKit /features +OptionId.Debugger
+# 清理安装文件
+RUN del C:\sdk\winsdksetup.exe
+
+
+# 设置工作目录
+WORKDIR C:\chromium
 
 # 克隆Chromium源码
 SHELL ["cmd", "/S", "/C"]
