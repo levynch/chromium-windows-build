@@ -40,6 +40,7 @@ ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 # 设置工作目录
 WORKDIR /sdk
 
+SHELL ["cmd", "/S", "/C"]
 # 下载 Windows SDK 安装程序
 ADD "https://download.microsoft.com/download/d/9/6/d968e973-c27d-4d17-ae51-fc7a98d9b0d3/windowssdk/winsdksetup.exe" C:\sdk\winsdksetup.exe
 
