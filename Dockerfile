@@ -25,7 +25,7 @@ RUN Invoke-WebRequest -OutFile C:\\vs_community.exe -Uri https://aka.ms/vs/17/re
         --add Microsoft.VisualStudio.Component.VC.ATLMFC \
         --add Microsoft.VisualStudio.Component.VC.Tools.x86.x64 \
         --includeRecommended' -Wait; \
-    Remove-Item C:\\vs_installer.exe -Force
+    Remove-Item C:\\vs_community.exe -Force
 
 
 # 安装Debugging Tools
