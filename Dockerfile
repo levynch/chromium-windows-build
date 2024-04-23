@@ -56,6 +56,8 @@ WORKDIR C:\chromium
 
 # 克隆Chromium源码
 SHELL ["cmd", "/S", "/C"]
+ENV PATH="C:\depot_tools;$PATH"
+ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 RUN fetch chromium --no-history
 RUN gclient sync 
 
