@@ -38,9 +38,9 @@ ENV DEPOT_TOOLS_WIN_TOOLCHAIN=0
 
 SHELL ["cmd", "/S", "/C"]
 # 安装Debugging Tools
-RUN $sdkPath = 'C:\Program Files (x86)\Windows Kits\10\'; `
-    $debugToolsPath = $sdkPath + 'Debuggers\x64\dbgsdk.msi'; `
-    start /w msiexec.exe --installPath $debugToolsPath --quiet --wait --norestart --nocache
+RUN set "sdkPath=C:\Program Files (x86)\Windows Kits\10\" && `
+    set "debugToolsPath=%sdkPath%Debuggers\x64\dbgsdk.msi" && `
+    start /w msiexec.exe /i "%debugToolsPath%" /quiet /norestart /wait /nocache
 
 # 克隆Chromium源码
 SHELL ["cmd", "/S", "/C"]
