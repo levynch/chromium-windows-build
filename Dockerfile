@@ -1,5 +1,3 @@
-# escape=`
-
 # Use the latest Windows Server Core 2022 image.
 FROM mcr.microsoft.com/windows/server:10.0.20348.2340-amd64
 
